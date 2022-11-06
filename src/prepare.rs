@@ -123,8 +123,8 @@ pub fn isolating_run_sequences(
                 }
             };
 
-            let sos = if seq_level.number() > pred_level.number() { seq_level } else { pred_level };
-            let eos = if seq_level.number() > succ_level.number() { seq_level } else { succ_level };
+            let sos = if seq_level.number() > pred_level.number() { &seq_level } else { &pred_level };
+            let eos = if seq_level.number() > succ_level.number() { &seq_level } else { &succ_level };
 
             IsolatingRunSequence {
                 runs: sequence,
