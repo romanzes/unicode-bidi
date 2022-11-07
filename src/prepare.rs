@@ -12,7 +12,6 @@
 //! <http://www.unicode.org/reports/tr9/#Preparations_for_Implicit_Processing>
 
 use alloc::vec::Vec;
-use core::cmp::max;
 use core::ops::Range;
 
 use super::level::Level;
@@ -124,10 +123,13 @@ pub fn isolating_run_sequences(
                 }
             };
 
+            let sos = if seq_level.number() > pred_level.number() { &seq_level } else { &pred_level };
+            let eos = if seq_level.number() > succ_level.number() { &seq_level } else { &succ_level };
+
             IsolatingRunSequence {
                 runs: sequence,
-                sos: max(seq_level, pred_level).bidi_class(),
-                eos: max(seq_level, succ_level).bidi_class(),
+                sos: sos.bidi_class(),
+                eos: eos.bidi_class(),
             }
         })
         .collect()
