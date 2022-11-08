@@ -97,6 +97,7 @@ use alloc::vec::Vec;
 use core::cmp::{max, min};
 use core::iter::repeat;
 use core::ops::Range;
+use std::println;
 
 use crate::format_chars as chars;
 use crate::BidiClass::*;
@@ -326,23 +327,34 @@ impl<'text> BidiInfo<'text> {
         text: &'a str,
         default_para_level: Option<Level>,
     ) -> BidiInfo<'a> {
+        println!("new_with_data_source 1");
         let InitialInfo {
             original_classes,
             paragraphs,
             ..
         } = InitialInfo::new_with_data_source(data_source, text, default_para_level);
+        println!("new_with_data_source 2");
 
         let mut levels = Vec::<Level>::with_capacity(text.len());
+        println!("new_with_data_source 3");
         let mut processing_classes = original_classes.clone();
+        println!("new_with_data_source 4");
 
         for para in &paragraphs {
+            println!("new_with_data_source paragraph 1");
             let text = &text[para.range.clone()];
+            println!("new_with_data_source paragraph 2");
             let original_classes = &original_classes[para.range.clone()];
+            println!("new_with_data_source paragraph 3");
             let processing_classes = &mut processing_classes[para.range.clone()];
+            println!("new_with_data_source paragraph 4");
 
             let new_len = levels.len() + para.range.len();
+            println!("new_with_data_source paragraph 5");
             levels.resize(new_len, para.level);
+            println!("new_with_data_source paragraph 6");
             let levels = &mut levels[para.range.clone()];
+            println!("new_with_data_source paragraph 7");
 
             explicit::compute(
                 text,
@@ -351,16 +363,25 @@ impl<'text> BidiInfo<'text> {
                 levels,
                 processing_classes,
             );
+            println!("new_with_data_source paragraph 8");
 
             let sequences = prepare::isolating_run_sequences(para.level, original_classes, levels);
+            println!("new_with_data_source paragraph 9");
             for sequence in &sequences {
+                println!("new_with_data_source paragraph sequence 1");
                 implicit::resolve_weak(sequence, processing_classes);
+                println!("new_with_data_source paragraph sequence 2");
                 implicit::resolve_neutral(sequence, levels, processing_classes);
+                println!("new_with_data_source paragraph sequence 3");
             }
+            println!("new_with_data_source paragraph 10");
             implicit::resolve_levels(processing_classes, levels);
+            println!("new_with_data_source paragraph 11");
 
             assign_levels_to_removed_chars(para.level, original_classes, levels);
+            println!("new_with_data_source paragraph 12");
         }
+        println!("new_with_data_source 5");
 
         BidiInfo {
             text,
