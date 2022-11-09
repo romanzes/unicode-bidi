@@ -44,31 +44,22 @@ pub fn isolating_run_sequences(
     original_classes: &[BidiClass],
     levels: &[Level],
 ) -> Vec<IsolatingRunSequence> {
-    println!("isolating_run_sequences 1");
     let runs = level_runs(levels, original_classes);
-    println!("isolating_run_sequences 2");
 
     // Compute the set of isolating run sequences.
     // <http://www.unicode.org/reports/tr9/#BD13>
     let mut sequences = Vec::with_capacity(runs.len());
-    println!("isolating_run_sequences 3");
 
     // When we encounter an isolate initiator, we push the current sequence onto the
     // stack so we can resume it after the matching PDI.
     let mut stack = vec![Vec::new()];
-    println!("isolating_run_sequences 4");
 
     for run in runs {
-        println!("isolating_run_sequences run 1");
         assert!(run.len() > 0);
-        println!("isolating_run_sequences run 2");
         assert!(!stack.is_empty());
-        println!("isolating_run_sequences run 3");
 
         let start_class = original_classes[run.start];
-        println!("isolating_run_sequences run 4");
         let end_class = original_classes[run.end - 1];
-        println!("isolating_run_sequences run 5");
 
         let mut sequence = if start_class == PDI && stack.len() > 1 {
             // Continue a previous sequence interrupted by an isolate.
@@ -77,10 +68,8 @@ pub fn isolating_run_sequences(
             // Start a new sequence.
             Vec::new()
         };
-        println!("isolating_run_sequences run 6");
 
         sequence.push(run);
-        println!("isolating_run_sequences run 7");
 
         if let RLI | LRI | FSI = end_class {
             // Resume this sequence after the isolate.
@@ -89,28 +78,20 @@ pub fn isolating_run_sequences(
             // This sequence is finished.
             sequences.push(sequence);
         }
-        println!("isolating_run_sequences run 8");
     }
-    println!("isolating_run_sequences 5");
     // Pop any remaning sequences off the stack.
     sequences.extend(stack.into_iter().rev().filter(|seq| !seq.is_empty()));
-    println!("isolating_run_sequences 6");
 
     // Determine the `sos` and `eos` class for each sequence.
     // <http://www.unicode.org/reports/tr9/#X10>
     sequences
         .into_iter()
         .map(|sequence: Vec<LevelRun>| {
-            println!("isolating_run_sequences sequence 1");
             assert!(!sequence.is_empty());
-            println!("isolating_run_sequences sequence 2");
 
             let start_of_seq = sequence[0].start;
-            println!("isolating_run_sequences sequence 3");
             let end_of_seq = sequence[sequence.len() - 1].end;
-            println!("isolating_run_sequences sequence 4");
             let seq_level = levels[start_of_seq];
-            println!("isolating_run_sequences sequence 5");
 
             #[cfg(test)]
             for run in sequence.clone() {
@@ -120,7 +101,6 @@ pub fn isolating_run_sequences(
                     }
                 }
             }
-            println!("isolating_run_sequences sequence 6");
 
             // Get the level of the last non-removed char before the runs.
             let pred_level = match original_classes[..start_of_seq]
@@ -130,7 +110,6 @@ pub fn isolating_run_sequences(
                 Some(idx) => levels[idx],
                 None => para_level,
             };
-            println!("isolating_run_sequences sequence 7");
 
             // Get the level of the next non-removed char after the runs.
             let succ_level = if let RLI | LRI | FSI = original_classes[end_of_seq - 1] {
