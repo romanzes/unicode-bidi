@@ -123,41 +123,19 @@ pub fn isolating_run_sequences(
                     None => para_level,
                 }
             };
-            println!("isolating_run_sequences sequence 8");
 
             println!("seq_level: {}", seq_level.number());
             println!("pred_level: {}", pred_level.number());
             println!("succ_level: {}", succ_level.number());
 
-            let sos = if seq_level.number() > pred_level.number() {
-                println!("using seq_level for sos");
-                &seq_level
-            } else {
-                println!("using pred_level for sos");
-                &pred_level
-            };
-            println!("isolating_run_sequences sequence 9");
-            let eos = if seq_level.number() > succ_level.number() {
-                println!("using seq_level for eos");
-                &seq_level
-            } else {
-                println!("using succ_level for eos");
-                &succ_level
-            };
-            println!("isolating_run_sequences sequence 10");
+            let sos = if seq_level.number() > pred_level.number() { &seq_level } else { &pred_level };
+            let eos = if seq_level.number() > succ_level.number() { &seq_level } else { &succ_level };
 
-            let sos_class = sos.bidi_class();
-            println!("isolating_run_sequences sequence 11");
-            let eos_class = eos.bidi_class();
-            println!("isolating_run_sequences sequence 12");
-
-            let result = IsolatingRunSequence {
+            IsolatingRunSequence {
                 runs: sequence,
-                sos: sos_class,
-                eos: eos_class,
-            };
-            println!("isolating_run_sequences sequence 13");
-            result
+                sos: sos.bidi_class(),
+                eos: eos.bidi_class(),
+            }
         })
         .collect()
 }
