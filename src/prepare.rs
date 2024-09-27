@@ -13,6 +13,7 @@
 
 use alloc::vec::Vec;
 use core::ops::Range;
+use std::println;
 
 use super::level::Level;
 use super::BidiClass::{self, *};
@@ -123,14 +124,30 @@ pub fn isolating_run_sequences(
                 }
             };
 
-            let sos = if seq_level.number() > pred_level.number() { &seq_level } else { &pred_level };
-            let eos = if seq_level.number() > succ_level.number() { &seq_level } else { &succ_level };
+            let sos = if seq_level.number() > pred_level.number() {
+                println!("using seq_level for sos");
+                &seq_level
+            } else {
+                println!("using pred_level for sos");
+                &pred_level
+            };
+            let eos = if seq_level.number() > succ_level.number() {
+                println!("using seq_level for eos");
+                &seq_level
+            } else {
+                println!("using succ_level for eos");
+                &succ_level
+            };
 
-            IsolatingRunSequence {
+            let sos_class = sos.bidi_class();
+            let eos_class = eos.bidi_class();
+
+            let result = IsolatingRunSequence {
                 runs: sequence,
-                sos: sos.bidi_class(),
-                eos: eos.bidi_class(),
-            }
+                sos: sos_class,
+                eos: eos_class,
+            };
+            result
         })
         .collect()
 }
